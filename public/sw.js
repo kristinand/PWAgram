@@ -67,3 +67,19 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+// Strategy: Network with Cache Fallback with Dynamic Caching
+// Not the best solution due to timeout problem when connection is slow
+
+// self.addEventListener('fetch', (event) => {
+//   event.respondWith(
+//     fetch(event.request)
+//       .then((res) => {
+//         return caches.open(CACHE_DYNAMIC).then((cache) => {
+//           cache.put(event.request.url, res.clone());
+//           return res;
+//         });
+//       })
+//       .catch(() => caches.match(event.request))
+//   );
+// });
