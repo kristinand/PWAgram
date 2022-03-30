@@ -1,4 +1,4 @@
-const CACHE_STATIC = 'static-v8';
+const CACHE_STATIC = 'static-v9';
 const CACHE_DYNAMIC = 'dynamic-v8';
 
 self.addEventListener('install', (event) => {
@@ -11,6 +11,7 @@ self.addEventListener('install', (event) => {
       cache.addAll([
         '/',
         '/index.html',
+        '/offline.html',
         '/src/js/app.js',
         '/src/js/feed.js',
         '/src/js/promise.js',
@@ -29,36 +30,40 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   console.log('[SW] activating sw...', event);
-  event.waitUntil(caches.keys().then(keyList => {
-    return Promise.all(keyList.map(key => {
-      if (key !== CACHE_STATIC && key !== CACHE_DYNAMIC) {
-        console.log(`[SW] removing old cache ${key}`);
-        return caches.delete(key);
-      }
-    }))
-  }));
+  event.waitUntil(
+    caches.keys().then((keyList) => {
+      return Promise.all(
+        keyList.map((key) => {
+          if (key !== CACHE_STATIC && key !== CACHE_DYNAMIC) {
+            console.log(`[SW] removing old cache ${key}`);
+            return caches.delete(key);
+          }
+        })
+      );
+    })
+  );
   return self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches
-      .match(event.request)
-      .then((res) => {
-        if (res) {
-          return res;
-        }
+    caches.match(event.request).then((res) => {
+      if (res) {
+        return res;
+      }
 
-        return fetch(event.request);
-      })
-      .then((res) => {
-        return caches.open(CACHE_DYNAMIC).then((cache) => {
-          cache.put(event.request.url, res.clone());
-          return res;
+      return fetch(event.request)
+        .then((res) => {
+          return caches.open(CACHE_DYNAMIC).then((cache) => {
+            cache.put(event.request.url, res.clone());
+            return res;
+          });
+        })
+        .catch(() => {
+          return caches.open(CACHE_STATIC).then((cache) => {
+            return cache.match('/offline.html');
+          });
         });
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-  )
+    })
+  );
 });
