@@ -1,5 +1,3 @@
-console.log('feed!');
-
 var shareImageButton = document.querySelector('#share-image-button');
 var createPostArea = document.querySelector('#create-post');
 var closeCreatePostModalButton = document.querySelector('#close-create-post-modal-btn');
@@ -22,6 +20,14 @@ function openCreatePostModal() {
 
     deferredPrompt = null;
   }
+
+  // if ('serviceWorker' in navigator) {
+  //   navigator.serviceWorker.getRegistrations().then((registrations) => {
+  //     for (let i = 0; i < registrations.length; i++) {
+  //       registrations[i].unregister();
+  //     }
+  //   });
+  // }
 }
 
 function closeCreatePostModal() {
@@ -42,8 +48,13 @@ function onSaveButtonClicked(event) {
   }
 }
 
+function clearCards() {
+  while (sharedMomentsArea.hasChildNodes()) {
+    sharedMomentsArea.removeChild(sharedMomentsArea.lastChild);
+  }
+}
+
 function createCard() {
-  console.log('create card');
   var cardWrapper = document.createElement('div');
   cardWrapper.className = 'shared-moment-card mdl-card mdl-shadow--2dp';
   var cardTitle = document.createElement('div');
@@ -70,10 +81,31 @@ function createCard() {
   sharedMomentsArea.appendChild(cardWrapper);
 }
 
-fetch('https://httpbin.org/get')
-  .then((res) => res.json())
-  .then(() => createCard());
+const url = 'https://httpbin.org/get';
+let networkDataRecieved = false;
 
-setTimeout(() => {
-  createCard();
-}, 1000);
+fetch(url)
+  .then((res) => res.json())
+  .then((data) => {
+    networkDataRecieved = true;
+    console.log('From web', data);
+    clearCards();
+    createCard();
+  });
+
+if ('caches' in window) {
+  caches
+    .match(url)
+    .then((res) => {
+      if (res) {
+        return res.json();
+      }
+    })
+    .then((data) => {
+      console.log('From cache', data);
+      if (networkDataRecieved) {
+        clearCards();
+        createCard();
+      }
+    });
+}
