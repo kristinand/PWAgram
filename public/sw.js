@@ -68,7 +68,7 @@ function trimCache(cacheName, maxItems) {
 }
 
 self.addEventListener('fetch', (event) => {
-  const url = 'https://httpbin.org/get';
+  const url = 'https://mypwa-a912b-default-rtdb.europe-west1.firebasedatabase.app/posts.json';
 
   if (new RegExp(url).test(event.request.url)) {
     // Strategy: Cache, then Network
