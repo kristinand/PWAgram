@@ -81,9 +81,10 @@ function createCard(data) {
   sharedMomentsArea.appendChild(cardWrapper);
 }
 
-const displayCards = (data) => {
+const displayCards = (data, isArray = false) => {
   clearCards();
-  const cards = Object.values(data);
+  const cards = isArray ? data : Object.values(data);
+
   if (cards) {
     cards.forEach((cardData) => createCard(cardData));
   }
@@ -100,18 +101,11 @@ fetch(url)
     displayCards(data);
   });
 
-if ('caches' in window) {
-  caches
-    .match(url)
-    .then((res) => {
-      if (res) {
-        return res.json();
-      }
-    })
-    .then((data) => {
+if ('indexedDB' in window) {
+  readAllData().then((data) => {
+    if (!networkDataRecieved) {
       console.log('From cache', data);
-      if (networkDataRecieved) {
-        displayCards(data);
-      }
-    });
+      displayCards(data, true);
+    }
+  });
 }

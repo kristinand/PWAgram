@@ -1,5 +1,8 @@
-const CACHE_STATIC = 'static-v14';
-const CACHE_DYNAMIC = 'dynamic-v8';
+importScripts('/src/js/idb.js');
+importScripts('/src/js/utility.js');
+
+const CACHE_STATIC = 'static';
+const CACHE_DYNAMIC = 'dynamic';
 const STATIC_FILES = [
   '/',
   '/index.html',
@@ -7,6 +10,7 @@ const STATIC_FILES = [
   '/src/js/app.js',
   '/src/js/feed.js',
   '/src/js/promise.js',
+  '/src/js/idb.js',
   '/src/js/fetch.js',
   '/src/js/material.min.js',
   '/src/css/app.css',
@@ -71,13 +75,19 @@ self.addEventListener('fetch', (event) => {
   const url = 'https://mypwa-a912b-default-rtdb.europe-west1.firebasedatabase.app/posts.json';
 
   if (new RegExp(url).test(event.request.url)) {
-    // Strategy: Cache, then Network
     event.respondWith(
-      caches.open(CACHE_DYNAMIC).then((cache) => {
-        return fetch(event.request).then((res) => {
-          cache.put(event.request, res.clone());
-          return res;
-        });
+      fetch(event.request).then((res) => {
+        const clonedRes = res.clone();
+        clearAllData()
+          .then(() => {
+            return clonedRes.json();
+          })
+          .then((data) => {
+            Object.values(data).forEach((posts) => {
+              writeData(posts);
+            });
+          });
+        return res;
       })
     );
   } else if (isInArray(event.request.url, STATIC_FILES)) {
