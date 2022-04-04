@@ -1,10 +1,11 @@
-var shareImageButton = document.querySelector('#share-image-button');
-var createPostArea = document.querySelector('#create-post');
-var closeCreatePostModalButton = document.querySelector('#close-create-post-modal-btn');
-var sharedMomentsArea = document.querySelector('#shared-moments');
+const shareImageButton = document.querySelector('#share-image-button');
+const createPostArea = document.querySelector('#create-post');
+const closeCreatePostModalButton = document.querySelector('#close-create-post-modal-btn');
+const sharedMomentsArea = document.querySelector('#shared-moments');
+const form = document.querySelector('form');
 
 function openCreatePostModal() {
-  createPostArea.style.display = 'block';
+  createPostArea.style.transform = 'translateY(0)';
   if (deferredPrompt) {
     deferredPrompt.prompt();
 
@@ -31,7 +32,7 @@ function openCreatePostModal() {
 }
 
 function closeCreatePostModal() {
-  createPostArea.style.display = 'none';
+  createPostArea.style.transform = 'translateY(100vh)';
 }
 
 shareImageButton.addEventListener('click', openCreatePostModal);
@@ -61,7 +62,6 @@ function createCard(data) {
   cardTitle.className = 'mdl-card__title';
   cardTitle.style.backgroundImage = `url(${data.image})`;
   cardTitle.style.backgroundSize = 'cover';
-  cardTitle.style.height = '180px';
   cardWrapper.appendChild(cardTitle);
   var cardTitleTextElement = document.createElement('h2');
   cardTitleTextElement.style.color = 'white';
@@ -102,10 +102,60 @@ fetch(url)
   });
 
 if ('indexedDB' in window) {
-  readAllData().then((data) => {
+  readAllData('posts').then((data) => {
     if (!networkDataRecieved) {
       console.log('From cache', data);
       displayCards(data, true);
     }
   });
 }
+
+function sendData(data) {
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+
+  const titleInput = document.querySelector('#title');
+  const locationInput = document.querySelector('#location');
+
+  if (!titleInput.value.trim() || !locationInput.value.trim()) {
+    alert('Please enter valid data!');
+    return;
+  }
+
+  closeCreatePostModal();
+
+  const post = {
+    id: new Date().toISOString(),
+    title: titleInput.value,
+    location: locationInput.value,
+  };
+
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    navigator.serviceWorker.ready.then((sw) => {
+      writeData('sync-posts', post)
+        .then(() => {
+          sw.sync.register('sync-new-post');
+        })
+        .then(() => {
+          const snackbarContainer = document.querySelector('#confirmation-toast');
+          const data = { message: 'Your post was saved for syncing!' };
+          snackbarContainer.MaterialSnackbar.showSnackbar(data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    });
+  } else {
+    sendData(post);
+  }
+});

@@ -20,6 +20,7 @@ const STATIC_FILES = [
   'https://fonts.googleapis.com/icon?family=Material+Icons',
   'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css',
 ];
+const url = 'https://mypwa-a912b-default-rtdb.europe-west1.firebasedatabase.app/posts.json';
 
 self.addEventListener('install', (event) => {
   console.log('[SW] installing sw...', event);
@@ -72,19 +73,17 @@ function trimCache(cacheName, maxItems) {
 }
 
 self.addEventListener('fetch', (event) => {
-  const url = 'https://mypwa-a912b-default-rtdb.europe-west1.firebasedatabase.app/posts.json';
-
   if (new RegExp(url).test(event.request.url)) {
     event.respondWith(
       fetch(event.request).then((res) => {
         const clonedRes = res.clone();
-        clearAllData()
+        clearAllData('posts')
           .then(() => {
             return clonedRes.json();
           })
           .then((data) => {
             Object.values(data).forEach((posts) => {
-              writeData(posts);
+              writeData('posts', posts);
             });
           });
         return res;
@@ -159,3 +158,31 @@ self.addEventListener('fetch', (event) => {
 //       .catch(() => caches.match(event.request))
 //   );
 // });
+
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'sync-new-post') {
+    console.log('[SW] Backround Syncing New Post');
+    event.waitUntil(
+      readAllData('sync-posts').then((posts) => {
+        posts.forEach((post) => {
+          fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+            body: JSON.stringify(post),
+          })
+            .then((res) => {
+              if (res.ok) {
+                clearOne('sync-posts', post.id);
+              }
+            })
+            .catch((err) => {
+              console.log('Error while sending data: ', err);
+            });
+        });
+      })
+    );
+  }
+});
