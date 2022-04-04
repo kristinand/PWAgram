@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "outDir": "./public/",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+  },
+  "include": ["src", "declarations.d.ts"]
+}
