@@ -1,6 +1,8 @@
 import { displayCards } from './utils/cardFunctions';
 import { readAllData, writeData } from './utils/indexedDBFunctions';
-import { ICard } from './types';
+import { ICard, EStores } from './types';
+
+const myNavigator: any = navigator;
 
 const url =
   'https://mypwa-a912b-default-rtdb.europe-west1.firebasedatabase.app/posts.json';
@@ -51,7 +53,7 @@ fetch(url)
   });
 
 if ('indexedDB' in window) {
-  readAllData('posts').then((data: ICard[]) => {
+  readAllData(EStores.Posts).then((data: ICard[]) => {
     if (!networkDataRecieved) {
       console.log('From cache', data);
       displayCards(data, true);
@@ -90,9 +92,9 @@ form.addEventListener('submit', (event) => {
     image: '',
   };
 
-  if ('serviceWorker' in navigator && 'SyncManager' in window) {
-    navigator.serviceWorker.ready.then((sw) => {
-      writeData('sync-posts', post)
+  if ('serviceWorker' in myNavigator && 'SyncManager' in window) {
+    myNavigator.serviceWorker.ready.then((sw: ServiceWorkerGlobalScope) => {
+      writeData(EStores.SyncPosts, post)
         .then(() => {
           // @ts-ignore
           sw.sync.register('sync-new-post');
