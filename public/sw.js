@@ -196,10 +196,38 @@ self.addEventListener("notificationClick", (event) => {
     console.log("Confirmed");
   } else {
     console.log(action);
+    event.waitUntil(
+      clients.matchAll().then((devices) => {
+        const device = devices.find((d) => d.visibilityState === "visible");
+
+        // open tab on tap on notification
+        if (device) {
+          device.navigate("https://localhost:8080");
+          device.focus();
+        } else {
+          devices.openWindow("https://localhost:8080");
+        }
+      })
+    );
   }
   notification.close();
 });
 
 self.addEventListener("notificationClose", (event) => {
   console.log("Notification was closed", event);
+});
+
+self.addEventListener("push", (event) => {
+  let data = { title: "New", content: "Test content" };
+
+  if (event.data) {
+    data = JSON.parse(event.data.text());
+  }
+
+  const options = {
+    body: data.content,
+    // TODO
+  };
+
+  event.waitUntil(self.registration.showNotification(data.title, options));
 });
