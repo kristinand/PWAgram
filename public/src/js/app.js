@@ -47,9 +47,57 @@ function displayConfirmNotification() {
     };
 
     navigator.serviceWorker.ready.then((swReg) => {
-      swReg.showNotification("Successfully subscribed (from SW)!", options);
+      swReg.showNotification("Successfully subscribed!", options);
     });
   }
+}
+
+function configurePushSub() {
+  if (!("serviceWorker" in navigator)) {
+    return;
+  }
+
+  let reg;
+  navigator.serviceWorker.ready
+    .then((swReg) => {
+      reg = swReg;
+      return swReg.pushManager.getSubscription();
+    })
+    .then((sub) => {
+      if (sub === null) {
+        // create new sub
+
+        const vapidPublicKey =
+          "BG-N1aBDrLMPN2mk8BbWluEp7WC2SawW6dLyfmkOu09ghVRIX7AZC6S25c2pt0PfKdzQ9x1fsabgS79JSGqzLx8";
+        const convertedVapidPublicKey = urlBase64ToUint8Array(vapidPublicKey);
+
+        return reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: convertedVapidPublicKey,
+        });
+      }
+    })
+    .then((newSub) => {
+      return fetch(
+        "https://mypwa-a912b-default-rtdb.europe-west1.firebasedatabase.app/subscribtions.json",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(newSub),
+        }
+      );
+    })
+    .then((res) => {
+      if (res.ok) {
+        displayConfirmNotification();
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 function askForNotificationPermission() {
@@ -57,13 +105,14 @@ function askForNotificationPermission() {
     if (result !== "granted") {
       console.log("No granted permission :(");
     } else {
-      displayConfirmNotification();
+      // displayConfirmNotification();
+      configurePushSub();
       // Hide button
     }
   });
 }
 
-if ("Notification" in window) {
+if ("Notification" in window && "serviceWorker" in navigator) {
   ntificationsButtons.forEach((button) => {
     button.style.display = "inline-block";
     button.addEventListener("click", askForNotificationPermission);
