@@ -10,7 +10,7 @@ module.exports = {
   },
   devtool: 'eval-cheap-source-map',
   devServer: {
-    open: true,
+    open: false,
   },
   plugins: [
     new MiniCssExtractPlugin({
