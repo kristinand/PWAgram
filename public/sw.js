@@ -1,41 +1,42 @@
-importScripts('/src/js/idb.js');
-importScripts('/src/js/utility.js');
+importScripts("/src/js/idb.js");
+importScripts("/src/js/utility.js");
 
-const CACHE_STATIC = 'static';
-const CACHE_DYNAMIC = 'dynamic';
+const CACHE_STATIC = "static";
+const CACHE_DYNAMIC = "dynamic";
 const STATIC_FILES = [
-  '/',
-  '/index.html',
-  '/offline.html',
-  '/src/js/app.js',
-  '/src/js/feed.js',
-  '/src/js/promise.js',
-  '/src/js/idb.js',
-  '/src/js/fetch.js',
-  '/src/js/material.min.js',
-  '/src/css/app.css',
-  '/src/css/feed.css',
-  '/src/images/main-image.jpg',
-  'https://fonts.googleapis.com/css?family=Roboto:400,700',
-  'https://fonts.googleapis.com/icon?family=Material+Icons',
-  'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css',
+  "/",
+  "/index.html",
+  "/offline.html",
+  "/src/js/app.js",
+  "/src/js/feed.js",
+  "/src/js/promise.js",
+  "/src/js/idb.js",
+  "/src/js/fetch.js",
+  "/src/js/material.min.js",
+  "/src/css/app.css",
+  "/src/css/feed.css",
+  "/src/images/main-image.jpg",
+  "https://fonts.googleapis.com/css?family=Roboto:400,700",
+  "https://fonts.googleapis.com/icon?family=Material+Icons",
+  "https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css",
 ];
-const url = 'https://mypwa-a912b-default-rtdb.europe-west1.firebasedatabase.app/posts.json';
+const url =
+  "https://mypwa-a912b-default-rtdb.europe-west1.firebasedatabase.app/posts.json";
 
-self.addEventListener('install', (event) => {
-  console.log('[SW] installing sw...', event);
+self.addEventListener("install", (event) => {
+  console.log("[SW] installing sw...", event);
 
   // it won't finish the installation event before cahce is open
   event.waitUntil(
     caches.open(CACHE_STATIC).then((cache) => {
-      console.log('[SW] precaching app shell');
+      console.log("[SW] precaching app shell");
       cache.addAll(STATIC_FILES);
     })
   );
 });
 
-self.addEventListener('activate', (event) => {
-  console.log('[SW] activating sw...', event);
+self.addEventListener("activate", (event) => {
+  console.log("[SW] activating sw...", event);
   event.waitUntil(
     caches.keys().then((keyList) => {
       return Promise.all(
@@ -72,18 +73,18 @@ function trimCache(cacheName, maxItems) {
   });
 }
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   if (new RegExp(url).test(event.request.url)) {
     event.respondWith(
       fetch(event.request).then((res) => {
         const clonedRes = res.clone();
-        clearAllData('posts')
+        clearAllData("posts")
           .then(() => {
             return clonedRes.json();
           })
           .then((data) => {
             Object.values(data).forEach((posts) => {
-              writeData('posts', posts);
+              writeData("posts", posts);
             });
           });
         return res;
@@ -110,8 +111,8 @@ self.addEventListener('fetch', (event) => {
           })
           .catch(() => {
             return caches.open(CACHE_STATIC).then((cache) => {
-              if (event.request.headers.get('accept').includes('text/html')) {
-                return cache.match('/offline.html');
+              if (event.request.headers.get("accept").includes("text/html")) {
+                return cache.match("/offline.html");
               }
             });
           });
@@ -159,30 +160,46 @@ self.addEventListener('fetch', (event) => {
 //   );
 // });
 
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-new-post') {
-    console.log('[SW] Backround Syncing New Post');
+self.addEventListener("sync", (event) => {
+  if (event.tag === "sync-new-post") {
+    console.log("[SW] Backround Syncing New Post");
     event.waitUntil(
-      readAllData('sync-posts').then((posts) => {
+      readAllData("sync-posts").then((posts) => {
         posts.forEach((post) => {
           fetch(url, {
-            method: 'POST',
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
+              "Content-Type": "application/json",
+              Accept: "application/json",
             },
             body: JSON.stringify(post),
           })
             .then((res) => {
               if (res.ok) {
-                clearOne('sync-posts', post.id);
+                clearOne("sync-posts", post.id);
               }
             })
             .catch((err) => {
-              console.log('Error while sending data: ', err);
+              console.log("Error while sending data: ", err);
             });
         });
       })
     );
   }
+});
+
+self.addEventListener("notificationClick", (event) => {
+  const notification = event.notification;
+  const action = event.action;
+
+  if (action === "confirm") {
+    console.log("Confirmed");
+  } else {
+    console.log(action);
+  }
+  notification.close();
+});
+
+self.addEventListener("notificationClose", (event) => {
+  console.log("Notification was closed", event);
 });
