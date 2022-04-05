@@ -1,46 +1,48 @@
-// @ts-nocheck
-import * as idb from '../lib/idb.js';
+import { openDb } from 'idb';
+import { ICard, EStores } from '../types';
 
-var dbPromise = idb.open('posts-store', 1, (db) => {
-  if (!db.objectStoreNames.contains('posts')) {
-    db.createObjectStore('posts', { keyPath: 'id' });
+const dbVersion = 1;
+
+const dbPromise = openDb('posts-store', dbVersion, (db) => {
+  if (!db.objectStoreNames.contains(EStores.Posts)) {
+    db.createObjectStore(EStores.Posts, { keyPath: 'id' });
   }
-  if (!db.objectStoreNames.contains('sync-posts')) {
-    db.createObjectStore('sync-posts', { keyPath: 'id' });
+  if (!db.objectStoreNames.contains(EStores.SyncPosts)) {
+    db.createObjectStore(EStores.SyncPosts, { keyPath: 'id' });
   }
 });
 
-export function writeData(st, data) {
+export function writeData(storeName: string, data: ICard) {
   return dbPromise.then((db) => {
-    const tx = db.transaction(st, 'readwrite');
-    const store = tx.objectStore(st);
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = tx.objectStore(storeName);
     store.put(data);
     return tx.complete; // return on every write operation, finish the transaction successfully
   });
 }
 
-export function readAllData(st) {
+export function readAllData(storeName: string) {
   return dbPromise.then((db) => {
-    const tx = db.transaction(st, 'readonly');
-    const store = tx.objectStore(st);
+    const tx = db.transaction(storeName, 'readonly');
+    const store = tx.objectStore(storeName);
     return store.getAll();
   });
 }
 
-export function clearAllData(st) {
+export function clearAllData(storeName: string) {
   return dbPromise.then((db) => {
-    const tx = db.transaction(st, 'readwrite');
-    const store = tx.objectStore(st);
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = tx.objectStore(storeName);
     store.clear();
     return tx.complete;
   });
 }
 
-export function clearOne(st, id) {
+export function clearOne(storeName: string, id: string) {
   return dbPromise
     .then((db) => {
-      const tx = db.transaction(st, 'readwrite');
-      const store = tx.objectStore(st);
+      const tx = db.transaction(storeName, 'readwrite');
+      const store = tx.objectStore(storeName);
       store.delete(id);
       return tx.complete;
     })

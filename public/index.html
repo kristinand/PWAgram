@@ -8,8 +8,14 @@
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>PWAGram</title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:400,700"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css"
@@ -21,15 +27,50 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="apple-mobile-web-app-title" content="PWAGram" />
     <link type="apple-touch-icon" href="./assets/" sizes="57x57" />
-    <link type="apple-touch-icon" href="./assets//images/icons/apple-icon-60x60.png" sizes="60x60" />
-    <link type="apple-touch-icon" href="./assets//images/icons/apple-icon-72x72.png" sizes="72x72" />
-    <link type="apple-touch-icon" href="./assets//images/icons/apple-icon-76x76.png" sizes="76x76" />
-    <link type="apple-touch-icon" href="./assets//images/icons/apple-icon-114x114.png" sizes="114x114" />
-    <link type="apple-touch-icon" href="./assets//images/icons/apple-icon-120x120.png" sizes="120x120" />
-    <link type="apple-touch-icon" href="./assets//images/icons/apple-icon-144x144.png" sizes="144x144" />
-    <link type="apple-touch-icon" href="./assets//images/icons/apple-icon-152x152.png" sizes="152x152" />
-    <link type="apple-touch-icon" href="./assets//images/icons/apple-icon-180x180.png" sizes="180x180" />
-    <meta name="msapplication-Title_Image" content="./assets//images/icons/app-icon-144x144.png" />
+    <link
+      type="apple-touch-icon"
+      href="./assets//images/icons/apple-icon-60x60.png"
+      sizes="60x60"
+    />
+    <link
+      type="apple-touch-icon"
+      href="./assets//images/icons/apple-icon-72x72.png"
+      sizes="72x72"
+    />
+    <link
+      type="apple-touch-icon"
+      href="./assets//images/icons/apple-icon-76x76.png"
+      sizes="76x76"
+    />
+    <link
+      type="apple-touch-icon"
+      href="./assets//images/icons/apple-icon-114x114.png"
+      sizes="114x114"
+    />
+    <link
+      type="apple-touch-icon"
+      href="./assets//images/icons/apple-icon-120x120.png"
+      sizes="120x120"
+    />
+    <link
+      type="apple-touch-icon"
+      href="./assets//images/icons/apple-icon-144x144.png"
+      sizes="144x144"
+    />
+    <link
+      type="apple-touch-icon"
+      href="./assets//images/icons/apple-icon-152x152.png"
+      sizes="152x152"
+    />
+    <link
+      type="apple-touch-icon"
+      href="./assets//images/icons/apple-icon-180x180.png"
+      sizes="180x180"
+    />
+    <meta
+      name="msapplication-Title_Image"
+      content="./assets//images/icons/app-icon-144x144.png"
+    />
     <meta name="msapplication-TileColor" content="#fff" />
     <meta name="theme-color" content="#3f51b5" />
   </head>
@@ -73,16 +114,25 @@
         <main class="mdl-layout__content mat-typography">
           <div id="create-post">
             <form>
-              <div class="input-section mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+              <div
+                class="input-section mdl-textfield mdl-js-textfield mdl-textfield--floating-label"
+              >
                 <input class="mdl-textfield__input" type="text" id="title" />
-                <label class="mdl-textfield__label" for="title" name="title">Title</label>
+                <label class="mdl-textfield__label" for="title" name="title"
+                  >Title</label
+                >
               </div>
               <div
                 class="input-section mdl-textfield mdl-js-textfield mdl-textfield--floating-label"
                 id="manual-location"
               >
                 <input class="mdl-textfield__input" type="text" id="location" />
-                <label class="mdl-textfield__label" for="location" name="location">Location</label>
+                <label
+                  class="mdl-textfield__label"
+                  for="location"
+                  name="location"
+                  >Location</label
+                >
               </div>
               <br />
               <div>
@@ -96,19 +146,32 @@
               </div>
               <br />
               <div>
-                <button class="mdl-button mdl-js-button mdl-button--fab" id="close-create-post-modal-button" type="button">
+                <button
+                  class="mdl-button mdl-js-button mdl-button--fab"
+                  id="close-create-post-modal-button"
+                  type="button"
+                >
                   <i class="material-icons">close</i>
                 </button>
               </div>
             </form>
           </div>
-          <img src="./assets/images/main-image.jpg" alt="Explore the City" class="main-image" />
+          <img
+            src="./assets/images/main-image.jpg"
+            alt="Explore the City"
+            class="main-image"
+          />
           <div class="page-content">
-            <h5 class="text-center mdl-color-text--primary">Share your Moments</h5>
+            <h5 class="text-center mdl-color-text--primary">
+              Share your Moments
+            </h5>
             <div id="shared-moments"></div>
           </div>
           <div class="floating-button">
-            <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored" id="share-image-button">
+            <button
+              class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored"
+              id="share-image-button"
+            >
               <i class="material-icons">add</i>
             </button>
           </div>
@@ -125,6 +188,8 @@
         </main>
       </div>
     </div>
+
+    <script defer src="./lib/material.min.js"></script>
     <script defer src="./bundle.js"></script>
   </body>
 </html>

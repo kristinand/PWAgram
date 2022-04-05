@@ -4,3 +4,8 @@ export interface ICard {
   location: string;
   image: string;
 }
+
+export enum EStores {
+  Posts = 'posts',
+  SyncPosts = 'sync-posts',
+}

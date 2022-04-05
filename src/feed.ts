@@ -90,26 +90,26 @@ form.addEventListener('submit', (event) => {
     image: '',
   };
 
-  // if ('serviceWorker' in navigator && 'SyncManager' in window) {
-  //   navigator.serviceWorker.ready.then((sw) => {
-  //     writeData('sync-posts', post)
-  //       .then(() => {
-  //         // @ts-ignore
-  //         sw.sync.register('sync-new-post');
-  //       })
-  //       .then(() => {
-  //         const snackbarContainer: HTMLDivElement = document.querySelector(
-  //           '#confirmation-toast'
-  //         );
-  //         const data = { message: 'Your post was saved for syncing!' };
-  //         // @ts-ignore
-  //         snackbarContainer.MaterialSnackbar.showSnackbar(data);
-  //       })
-  //       .catch((err: Error) => {
-  //         console.log(err);
-  //       });
-  //   });
-  // } else {
-  //   sendData(post);
-  // }
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    navigator.serviceWorker.ready.then((sw) => {
+      writeData('sync-posts', post)
+        .then(() => {
+          // @ts-ignore
+          sw.sync.register('sync-new-post');
+        })
+        .then(() => {
+          const snackbarContainer: HTMLDivElement = document.querySelector(
+            '#confirmation-toast'
+          );
+          const data = { message: 'Your post was saved for syncing!' };
+          // @ts-ignore
+          snackbarContainer.MaterialSnackbar.showSnackbar(data);
+        })
+        .catch((err: Error) => {
+          console.log(err);
+        });
+    });
+  } else {
+    sendData(post);
+  }
 });
