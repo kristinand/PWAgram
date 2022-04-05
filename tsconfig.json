@@ -2,10 +2,10 @@
   "compilerOptions": {
     "baseUrl": "src",
     "outDir": "./public/",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": ["dom", "esnext", "WebWorker"],
     "sourceMap": true,
     "esModuleInterop": true,
-    "noImplicitAny": true,
+    "noImplicitAny": true
   },
   "include": ["src", "declarations.d.ts"]
 }
