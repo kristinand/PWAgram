@@ -4,7 +4,7 @@ const ntificationsButtons = document.querySelectorAll(".enable-notifications");
 // Check if service workers supported by browser
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
-    .register("/sw.js")
+    .register("/service-worker.js")
     .then(() => {
       console.log("SW registered");
     })

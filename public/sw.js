@@ -1,3 +1,5 @@
+// implementation without workbox, just example, don't use it
+
 importScripts('/src/js/idb.js');
 importScripts('/src/js/utility.js');
 
